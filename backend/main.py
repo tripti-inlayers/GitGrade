@@ -1,0 +1,36 @@
+from fastapi import FastAPI
+from services.github_fetcher import get_repo_details,get_readme,get_commits,get_contributors,get_file_tree,fetch_snapshot
+from services.evidence_extractor import extract_documentation
+
+app = FastAPI()
+
+
+@app.get("/")
+def home():
+    return {"message": "GitGrade Backend Running"}
+
+
+@app.get("/repo/{owner}/{repo}")
+def repo_details(owner: str, repo: str):
+    return get_repo_details(owner, repo)
+
+@app.get("/readme/{owner}/{repo}")
+def readme(owner: str, repo: str):
+    return get_readme(owner, repo)
+
+@app.get("/commits/{owner}/{repo}")
+def commits(owner: str, repo: str):
+    return get_commits(owner, repo)
+
+@app.get("/contributors/{owner}/{repo}")
+def contributors(owner: str, repo: str):
+    return get_contributors(owner, repo)
+
+@app.get("/tree/{owner}/{repo}")
+def tree(owner: str, repo: str):
+    return get_file_tree(owner, repo)
+
+@app.get("/documentation/{owner}/{repo}")
+def documentation(owner: str, repo: str):
+    snapshot = fetch_snapshot(owner, repo)
+    return extract_documentation(snapshot)
