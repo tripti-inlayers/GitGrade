@@ -1,4 +1,5 @@
 import requests
+import base64
 
 
 def get_repo_details(owner, repo):
@@ -33,11 +34,16 @@ def get_readme(owner, repo):
 
     data = response.json()
 
+    content = base64.b64decode(
+        data["content"]
+    ).decode("utf-8")
+
     return {
         "exists": True,
         "data": {
             "name": data["name"],
-            "size": data["size"]
+            "size": data["size"],
+            "content": content
         }
     }
 
