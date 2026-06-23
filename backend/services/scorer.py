@@ -33,7 +33,7 @@ def score_organization(evidence):
     if evidence["dependency_file_present"]:
         score += 20
 
-    if evidence["src_folder_present"]:
+    if evidence["logical_structure_present"]:
         score += 20
 
     if evidence["tests_folder_present"]:
@@ -43,3 +43,28 @@ def score_organization(evidence):
         score += 20
 
     return score
+
+def score_development_practices(evidence):
+    score = 0
+
+    if evidence["commit_count"] >= 20:
+        score += 30
+    elif evidence["commit_count"] >= 10:
+        score += 20
+    elif evidence["commit_count"] >= 5:
+        score += 10
+
+    score += int(
+        evidence["quality_commit_ratio"] * 40
+    )
+
+    spread = evidence["commit_activity_spread_days"]
+
+    if spread >= 30:
+        score += 30
+    elif spread >= 14:
+        score += 20
+    elif spread >= 7:
+        score += 10
+
+    return min(score, 100)

@@ -5,7 +5,9 @@ import base64
 def get_repo_details(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
+    print(response.status_code)
+    print(response.text)
 
     if response.status_code != 200:
         return {"error": "Repository not found"}
@@ -24,7 +26,7 @@ def get_repo_details(owner, repo):
 def get_readme(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/readme"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         return {
@@ -53,7 +55,7 @@ def get_readme(owner, repo):
 def get_commits(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/commits?per_page=50"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         return {
@@ -81,7 +83,7 @@ def get_commits(owner, repo):
 def get_contributors(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors?per_page=20"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         return {
@@ -106,13 +108,24 @@ def get_contributors(owner, repo):
 
 def get_file_tree(owner, repo):
     repo_data = get_repo_details(owner, repo)
-    print(repo_data)
+    print("REPO DATA:", repo_data)
 
     default_branch = repo_data["default_branch"]
 
+    branch_url = f"https://api.github.com/repos/{owner}/{repo}/branches/{default_branch}"
+
+    branch_response = requests.get(branch_url)
+
+    branch_data = branch_response.json()
+
+    tree_sha = branch_data["commit"]["commit"]["tree"]["sha"]
+
     url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{default_branch}?recursive=1"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
+
+    print(response.status_code)
+    print(response.json())
 
     if response.status_code != 200:
         return {

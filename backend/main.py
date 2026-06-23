@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from services.github_fetcher import get_repo_details,get_readme,get_commits,get_contributors,get_file_tree,fetch_snapshot
-from services.evidence_extractor import extract_documentation, extract_organization
-from services.scorer import score_documentation, score_organization
+from services.evidence_extractor import extract_documentation, extract_organization, extract_development_practices
+from services.scorer import score_documentation, score_organization, score_development_practices
 
 app = FastAPI()
 
@@ -61,5 +61,24 @@ def organization_score(owner: str, repo: str):
 
     return {
         "organization_score": score_organization(evidence),
+        "evidence": evidence
+    }
+
+@app.get("/dev-practices/{owner}/{repo}")
+def dev_practices(owner: str, repo: str):
+    snapshot = fetch_snapshot(owner, repo)
+
+    return extract_development_practices(snapshot)
+
+@app.get("/dev-practices-score/{owner}/{repo}")
+def dev_practices_score(owner: str, repo: str):
+    snapshot = fetch_snapshot(owner, repo)
+
+    evidence = extract_development_practices(snapshot)
+
+    score = score_development_practices(evidence)
+
+    return {
+        "score": score,
         "evidence": evidence
     }
