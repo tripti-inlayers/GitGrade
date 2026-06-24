@@ -68,3 +68,37 @@ def score_development_practices(evidence):
         score += 10
 
     return min(score, 100)
+
+def score_project_readiness(evidence):
+    score = 0
+
+    if evidence["has_license"]:
+        score += 25
+
+    if evidence["has_deployment_evidence"]:
+        score += 25
+
+    if evidence["repo_age_days"] >= 30:
+        score += 25
+    elif evidence["repo_age_days"] >= 7:
+        score += 15
+
+    if evidence["recent_activity_days"] <= 30:
+        score += 25
+    elif evidence["recent_activity_days"] <= 90:
+        score += 15
+
+    return score
+
+def calculate_overall_score(
+    documentation,
+    organization,
+    development,
+    readiness
+):
+    return round(
+        documentation * 0.30 +
+        organization * 0.20 +
+        development * 0.30 +
+        readiness * 0.20
+    )

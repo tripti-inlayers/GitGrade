@@ -20,7 +20,8 @@ def get_repo_details(owner, repo):
         "description": data["description"],
         "stars": data["stargazers_count"],
         "forks": data["forks_count"],
-        "default_branch": data["default_branch"]
+        "default_branch": data["default_branch"],
+        "created_at": data["created_at"]
     }
 
 def get_readme(owner, repo):

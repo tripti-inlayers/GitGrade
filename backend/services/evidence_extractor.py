@@ -218,3 +218,67 @@ def extract_development_practices(snapshot):
         "commit_activity_spread_days":
             commit_activity_spread_days
     }
+
+def extract_project_readiness(snapshot):
+    paths = []
+
+    if snapshot["file_tree"]["exists"]:
+        paths = snapshot["file_tree"]["data"]
+
+    repo = snapshot["repo"]
+
+    has_license = any(
+        path.lower() in [
+            "license",
+            "license.md",
+            "license.txt"
+        ]
+        for path in paths
+    )
+
+    DEPLOYMENT_FILES = [
+        "dockerfile",
+        "docker-compose.yml",
+        "procfile"
+    ]
+
+    has_deployment_evidence = any(
+        path.lower() in DEPLOYMENT_FILES
+        or path.startswith(".github/workflows/")
+        or path.endswith("vercel.json")
+        for path in paths
+    )
+
+    created_date = datetime.fromisoformat(
+        repo["created_at"].replace("Z", "+00:00")
+    )
+
+    repo_age_days = (
+        datetime.now(created_date.tzinfo)
+        - created_date
+    ).days
+
+    commits = []
+
+    if snapshot["commits"]["exists"]:
+        commits = snapshot["commits"]["data"]
+
+    recent_activity_days = None
+
+    if commits:
+        latest_commit_date = datetime.fromisoformat(
+            commits[0]["date"].replace("Z", "+00:00")
+        )
+
+        recent_activity_days = (
+            datetime.now(latest_commit_date.tzinfo)
+            - latest_commit_date
+        ).days
+
+    return {
+        "has_license": has_license,
+        "has_deployment_evidence":
+            has_deployment_evidence,
+        "repo_age_days": repo_age_days,
+        "recent_activity_days": recent_activity_days
+    }
