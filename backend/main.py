@@ -3,6 +3,11 @@ from services.github_fetcher import get_repo_details,get_readme,get_commits,get_
 from services.evidence_extractor import extract_documentation, extract_organization, extract_development_practices, extract_project_readiness
 from services.scorer import score_documentation, score_organization, score_development_practices, score_project_readiness, calculate_overall_score
 from services.analyzer import analyze_repository
+from dotenv import load_dotenv
+from services.ai_analyzer import generate_report
+
+load_dotenv()
+
 
 app = FastAPI()
 
@@ -111,3 +116,21 @@ def analyze_repo(owner: str, repo: str):
     snapshot = fetch_snapshot(owner, repo)
 
     return analyze_repository(snapshot)
+
+@app.get("/report/{owner}/{repo}")
+def report(owner: str, repo: str):
+
+    snapshot = fetch_snapshot(
+        owner,
+        repo
+    )
+
+    analysis = analyze_repository(
+        snapshot
+    )
+
+    ai_report = generate_report(
+        analysis
+    )
+
+    return ai_report

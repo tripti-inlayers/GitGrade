@@ -21,3 +21,10 @@ class RepositoryScores:
 class RepositoryAnalysis:
     evidence: RepositoryEvidence
     scores: RepositoryScores
+
+@dataclass
+class AIReport:
+    summary: str
+    strengths: list[str]
+    weaknesses: list[str]
+    recommendations: list[str]
