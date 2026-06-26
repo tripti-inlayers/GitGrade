@@ -4,8 +4,6 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-from models import AIReport
-
 load_dotenv()
 
 genai.configure(
@@ -17,33 +15,37 @@ genai.configure(
 
 
 def build_evidence_summary(analysis):
+
+    scores = analysis["scores"]
+    evidence = analysis["evidence"]
+
     return f"""
 OVERALL SCORE:
-{analysis["overall_score"]}
+{scores["overall"]}
 
 DOCUMENTATION SCORE:
-{analysis["documentation"]["score"]}
+{scores["documentation"]}
 
 DOCUMENTATION EVIDENCE:
-{analysis["documentation"]["evidence"]}
+{evidence["documentation"]}
 
 ORGANIZATION SCORE:
-{analysis["organization"]["score"]}
+{scores["organization"]}
 
 ORGANIZATION EVIDENCE:
-{analysis["organization"]["evidence"]}
+{evidence["organization"]}
 
-DEVELOPMENT SCORE:
-{analysis["development"]["score"]}
+DEVELOPMENT PRACTICES SCORE:
+{scores["development"]}
 
-DEVELOPMENT EVIDENCE:
-{analysis["development"]["evidence"]}
+DEVELOPMENT PRACTICES EVIDENCE:
+{evidence["development"]}
 
 PROJECT READINESS SCORE:
-{analysis["project_readiness"]["score"]}
+{scores["project_readiness"]}
 
 PROJECT READINESS EVIDENCE:
-{analysis["project_readiness"]["evidence"]}
+{evidence["project_readiness"]}
 """
 
 def build_prompt(evidence_summary):
@@ -68,8 +70,8 @@ JSON Schema:
 
 {{
     "summary": "string",
-    "strengths": ["string"],
-    "weaknesses": ["string"],
+    "highlights": ["string"],
+    "improvement_areas": ["string"],
     "recommendations": ["string"]
 }}
 
@@ -111,20 +113,20 @@ def generate_report(analysis):
 
         parsed = json.loads(raw)
 
-        return AIReport(
-            summary=parsed["summary"],
-            strengths=parsed["strengths"],
-            weaknesses=parsed["weaknesses"],
-            recommendations=parsed["recommendations"]
-        )
+        return {
+            "summary": parsed["summary"],
+            "highlights": parsed["highlights"],
+            "improvement_areas": parsed["improvement_areas"],
+            "recommendations": parsed["recommendations"],
+        }
 
     except Exception as e:
         print("AI ERROR:", e)
 
         return {
-            "summary": "AI report unavailable.",
-            "strengths": [],
-            "weaknesses": [],
+            "summary": "AI assessment unavailable.",
+            "highlights": [],
+            "improvement_areas": [],
             "recommendations": [],
             "error": str(e)
         }

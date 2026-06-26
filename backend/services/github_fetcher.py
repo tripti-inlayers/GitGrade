@@ -6,23 +6,24 @@ def get_repo_details(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}"
 
     response = requests.get(url, timeout=10)
-    print(response.status_code)
-    print(response.text)
-
     if response.status_code != 200:
         return {"error": "Repository not found"}
 
     data = response.json()
 
     return {
-        "name": data["name"],
-        "owner": data["owner"]["login"],
-        "description": data["description"],
-        "stars": data["stargazers_count"],
-        "forks": data["forks_count"],
-        "default_branch": data["default_branch"],
-        "created_at": data["created_at"]
-    }
+    "name": data["name"],
+    "owner": data["owner"]["login"],
+    "description": data["description"],
+    "stars": data["stargazers_count"],
+    "forks": data["forks_count"],
+    "language": data["language"],
+    "avatar_url": data["owner"]["avatar_url"],
+    "html_url": data["html_url"],
+    "default_branch": data["default_branch"],
+    "created_at": data["created_at"],
+    "updated_at": data["updated_at"]
+}
 
 def get_readme(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/readme"
@@ -109,24 +110,12 @@ def get_contributors(owner, repo):
 
 def get_file_tree(owner, repo):
     repo_data = get_repo_details(owner, repo)
-    print("REPO DATA:", repo_data)
 
     default_branch = repo_data["default_branch"]
-
-    branch_url = f"https://api.github.com/repos/{owner}/{repo}/branches/{default_branch}"
-
-    branch_response = requests.get(branch_url)
-
-    branch_data = branch_response.json()
-
-    tree_sha = branch_data["commit"]["commit"]["tree"]["sha"]
 
     url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{default_branch}?recursive=1"
 
     response = requests.get(url, timeout=10)
-
-    print(response.status_code)
-    print(response.json())
 
     if response.status_code != 200:
         return {

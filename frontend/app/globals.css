@@ -1,26 +1,603 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
+/* ============================================================
+   GitGrade — Tailwind CSS 4.3 Design System
+   globals.css — the ONLY configuration file needed.
+
+   HOW THIS FILE IS STRUCTURED
+   ─────────────────────────────────────────────────────────
+   1. @import "tailwindcss"
+      Replaces the old @tailwind base/components/utilities
+      directives. One line is all that is needed.
+
+   2. @theme { … }
+      Registers design tokens as CSS custom properties under
+      Tailwind's theme namespace. Every --color-*, --shadow-*,
+      --radius-*, --font-*, --text-* variable declared here
+      automatically generates the corresponding atomic utility
+      class (bg-canvas, shadow-card, rounded-lg, text-ink …).
+
+      Namespace rules (v4):
+        --color-*         → bg-*, text-*, border-*, fill-*, …
+        --shadow-*        → shadow-*
+        --radius-*        → rounded-*
+        --font-*          → font-{family}  (NOT --font-family-*)
+        --text-*          → text-{size}    (size utilities)
+        --leading-*       → leading-*
+        --tracking-*      → tracking-*
+        --font-weight-*   → font-*         (weight utilities)
+        --spacing-*       → p-*, m-*, gap-*, w-*, h-* …
+        --width-*         → NOT auto-generated; use @layer utilities
+
+   3. @layer base { … }
+      Global resets and element defaults.
+
+   4. @layer components { … }
+      Semantic multi-property classes: btn-primary, card,
+      input-base, badge, tier-*, page-container, etc.
+      These CANNOT be expressed as single atomic utilities.
+
+   5. @layer utilities { … }
+      Single-purpose helpers that Tailwind does not emit
+      automatically: score display composites, chevron state,
+      explicit max-width aliases.
+   ============================================================ */
+
+/* ============================================================
+   1. THEME TOKENS
+      Everything declared here generates atomic utilities.
+   ============================================================ */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+
+  /* ── Colors ─────────────────────────────────────────────
+     Custom properties defined on :root for theme tokens.
+     Tailwind v4 @theme is not recognized by some editors.
+  ─────────────────────────────────────────────────────── */
+
+  /* Surfaces */
+  --color-canvas:          #F8FAFC;
+  --color-surface:         #FFFFFF;
+  --color-overlay:         #F4F4F2;
+
+  /* Borders */
+  --color-border:          #E5E5E3;
+  --color-border-strong:   #D1D1CE;
+
+  /* Text */
+  --color-ink:             #111110;
+  --color-subtle:          #6B7280;
+  --color-ghost:           #9CA3AF;
+
+  /* Accent */
+  --color-accent:          #2563EB;
+  --color-accent-hover:    #1D4ED8;
+  --color-accent-muted:    #EFF6FF;
+
+  /* Score tiers */
+  --color-score-high:      #16A34A;
+  --color-score-high-bg:   #F0FDF4;
+  --color-score-mid:       #D97706;
+  --color-score-mid-bg:    #FFFBEB;
+  --color-score-low:       #DC2626;
+  --color-score-low-bg:    #FEF2F2;
+
+  /* ── Font families ───────────────────────────────────────
+     v4 namespace: --font-{name}  →  font-{name} utility
+     (NOT --font-family-*)
+  ─────────────────────────────────────────────────────── */
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Font sizes ──────────────────────────────────────────
+     v4 namespace: --text-{name}  →  text-{name} utility
+     (NOT --font-size-*)
+     Paired line-heights: --leading-{name}  →  leading-{name}
+  ─────────────────────────────────────────────────────── */
+
+  --text-2xs:      0.625rem;
+  --text-xs:       0.75rem;
+  --text-sm:       0.875rem;
+  --text-base:     1rem;
+  --text-lg:       1.125rem;
+  --text-xl:       1.25rem;
+  --text-2xl:      1.5rem;
+  --text-3xl:      1.875rem;
+  --text-4xl:      2.25rem;
+  --text-score-sm: 3rem;
+  --text-score-lg: 5.5rem;
+
+  --leading-2xs:      1rem;
+  --leading-xs:       1.125rem;
+  --leading-sm:       1.375rem;
+  --leading-base:     1.625rem;
+  --leading-lg:       1.75rem;
+  --leading-xl:       1.875rem;
+  --leading-2xl:      2rem;
+  --leading-3xl:      2.25rem;
+  --leading-4xl:      2.5rem;
+  --leading-score-sm: 1;
+  --leading-score-lg: 1;
+
+  /* ── Letter spacing ──────────────────────────────────────
+     v4 namespace: --tracking-{name}  →  tracking-{name}
+  ─────────────────────────────────────────────────────── */
+
+  --tracking-2xl:      -0.015em;
+  --tracking-3xl:      -0.02em;
+  --tracking-4xl:      -0.025em;
+  --tracking-score-sm: -0.04em;
+  --tracking-score-lg: -0.05em;
+
+  /* ── Font weights ────────────────────────────────────────
+     v4 namespace: --font-weight-{name}  →  font-{name}
+  ─────────────────────────────────────────────────────── */
+
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* ── Border radius ───────────────────────────────────────
+     v4 namespace: --radius-{name}  →  rounded-{name}
+     DEFAULT maps to rounded (no suffix)
+  ─────────────────────────────────────────────────────── */
+
+  --radius:    0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* ── Shadows ─────────────────────────────────────────────
+     v4 namespace: --shadow-{name}  →  shadow-{name}
+  ─────────────────────────────────────────────────────── */
+
+  --shadow-card:       0 1px 2px 0 rgb(0 0 0 / 0.04),
+                       0 1px 6px 0 rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 4px 8px 0 rgb(0 0 0 / 0.06),
+                       0 1px 3px 0 rgb(0 0 0 / 0.04);
+  --shadow-focus:      0 0 0 3px rgb(37 99 235 / 0.12);
+  --shadow-score:      0 8px 24px 0 rgb(0 0 0 / 0.08),
+                       0 2px 6px 0 rgb(0 0 0 / 0.04);
+
+  /* ── Spacing ─────────────────────────────────────────────
+     v4 namespace: --spacing-{name}
+     Generates p-*, m-*, gap-*, w-*, h-* for numeric names.
+     Named tokens (page, section, card) are used explicitly
+     in @layer components below — they do not auto-generate
+     utility classes in v4, so we also define them as plain
+     CSS custom properties for use with arbitrary values or
+     component classes.
+  ─────────────────────────────────────────────────────── */
+
+  --spacing-page:     5rem;
+  --spacing-page-sm:  1.25rem;
+  --spacing-section:  4rem;
+  --spacing-card:     1.5rem;
+
+  /* ── Transitions ─────────────────────────────────────────
+     Not auto-generated as utilities; consumed by components.
+  ─────────────────────────────────────────────────────── */
+
+  --ease-out-expo:  cubic-bezier(0.19, 1, 0.22, 1);
+  --duration-fast:  150ms;
+  --duration-slow:  250ms;
+
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   2. BASE — resets + element defaults
+   ============================================================ */
+
+@layer base {
+
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color:            var(--color-ink);
+    font-family:      var(--font-sans);
+    font-size:        var(--text-base);
+    line-height:      var(--leading-base);
+    font-weight:      var(--font-weight-normal);
+  }
+
+  :focus-visible {
+    outline:    none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  code, kbd, pre, samp {
+    font-family: var(--font-mono);
+    font-size:   0.9em;
+  }
+
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+/* ============================================================
+   3. COMPONENTS — semantic multi-property classes
+      These are the classes that CANNOT be expressed as a
+      single atomic utility and therefore must live here.
+   ============================================================ */
+
+@layer components {
+
+  /* ── Layout ──────────────────────────────────────────── */
+
+  /*
+    page-container
+    Full-width wrapper with responsive horizontal padding.
+    Usage: <div className="page-container">
+  */
+  .page-container {
+    width: 100%;
+    padding-inline: var(--spacing-page-sm);
+  }
+
+  @media (min-width: 768px) {
+    .page-container {
+      padding-inline: var(--spacing-page);
+    }
+  }
+
+  /*
+    content-column
+    Single-column centered content (max 720px).
+    Usage: <div className="content-column">
+  */
+  .content-column {
+    width:     100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  /*
+    content-column-wide
+    Wider centered content (max 960px).
+    Usage: <div className="content-column-wide">
+  */
+  .content-column-wide {
+    width:         100%;
+    max-width:     1400px;
+    margin-inline: auto;
+  }
+
+  /* ── Cards ───────────────────────────────────────────── */
+
+  /*
+    card
+    Base card surface with border + shadow.
+    Usage: <div className="card">
+  */
+  .card {
+    background-color: var(--color-surface);
+    border-radius:    var(--radius-lg);
+    border:           1px solid var(--color-border);
+    box-shadow:       var(--shadow-card);
+  }
+
+  /*
+    card-pad
+    Card with standard inner padding added.
+    Usage: <div className="card-pad">
+  */
+  .card-pad {
+    background-color: var(--color-surface);
+    border-radius:    var(--radius-lg);
+    border:           1px solid var(--color-border);
+    box-shadow:       var(--shadow-card);
+    padding:          var(--spacing-card);
+  }
+
+  /* ── Buttons ─────────────────────────────────────────── */
+
+  /*
+    btn-primary
+    Filled accent button.
+    Usage: <button className="btn-primary">Analyze</button>
+  */
+  .btn-primary {
+    display:          inline-flex;
+    align-items:      center;
+    justify-content:  center;
+    gap:              0.5rem;
+    padding-inline:   1.25rem;
+    padding-block:    0.625rem;
+    background-color: var(--color-accent);
+    color:            #ffffff;
+    font-size:        var(--text-sm);
+    font-weight:      var(--font-weight-semibold);
+    line-height:      var(--leading-sm);
+    border-radius:    var(--radius-md);
+    border:           1px solid transparent;
+    cursor:           pointer;
+    transition:       background-color var(--duration-fast) var(--ease-out-expo),
+                      box-shadow       var(--duration-fast) var(--ease-out-expo);
+    white-space:      nowrap;
+    text-decoration:  none;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .btn-primary:focus-visible {
+    outline:    none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor:  not-allowed;
+  }
+
+  /*
+    btn-ghost
+    Borderless secondary button.
+    Usage: <button className="btn-ghost">Cancel</button>
+  */
+  .btn-ghost {
+    display:          inline-flex;
+    align-items:      center;
+    justify-content:  center;
+    gap:              0.5rem;
+    padding-inline:   1rem;
+    padding-block:    0.5rem;
+    background-color: transparent;
+    color:            var(--color-subtle);
+    font-size:        var(--text-sm);
+    font-weight:      var(--font-weight-medium);
+    line-height:      var(--leading-sm);
+    border-radius:    var(--radius-md);
+    border:           1px solid transparent;
+    cursor:           pointer;
+    transition:       background-color var(--duration-fast) var(--ease-out-expo),
+                      color            var(--duration-fast) var(--ease-out-expo);
+    white-space:      nowrap;
+    text-decoration:  none;
+  }
+
+  .btn-ghost:hover {
+    background-color: var(--color-overlay);
+    color:            var(--color-ink);
+  }
+
+  .btn-ghost:focus-visible {
+    outline:    none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  .btn-ghost:disabled {
+    opacity: 0.5;
+    cursor:  not-allowed;
+  }
+
+  /* ── Input ───────────────────────────────────────────── */
+
+  /*
+    input-base
+    Standard text input / URL input.
+    Usage: <input className="input-base" type="url" />
+  */
+  .input-base {
+    display:          block;
+    width:            100%;
+    padding-inline:   0.875rem;
+    padding-block:    0.625rem;
+    background-color: var(--color-surface);
+    color:            var(--color-ink);
+    font-family:      var(--font-sans);
+    font-size:        var(--text-sm);
+    line-height:      var(--leading-sm);
+    border:           1px solid var(--color-border);
+    border-radius:    var(--radius-md);
+    box-shadow:       var(--shadow-card);
+    transition:       border-color var(--duration-fast) var(--ease-out-expo),
+                      box-shadow   var(--duration-fast) var(--ease-out-expo);
+    outline:          none;
+  }
+
+  .input-base::placeholder {
+    color: var(--color-ghost);
+  }
+
+  .input-base:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  .input-base:focus {
+    border-color: var(--color-accent);
+    box-shadow:   var(--shadow-focus);
+  }
+
+  /* ── Typography helpers ──────────────────────────────── */
+
+  /*
+    label
+    Form field label / section eyebrow.
+    Usage: <label className="label">Repository URL</label>
+  */
+  .label {
+    display:       block;
+    font-size:     var(--text-xs);
+    font-weight:   var(--font-weight-semibold);
+    line-height:   var(--leading-xs);
+    color:         var(--color-subtle);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ── Badges ──────────────────────────────────────────── */
+
+  /*
+    badge
+    Base pill badge — apply alongside a tier modifier or alone.
+    Usage: <span className="badge">Neutral</span>
+  */
+  .badge {
+    display:          inline-flex;
+    align-items:      center;
+    gap:              0.25rem;
+    padding-inline:   0.5rem;
+    padding-block:    0.125rem;
+    font-family:      var(--font-mono);
+    font-size:        var(--text-xs);
+    font-weight:      var(--font-weight-medium);
+    line-height:      var(--leading-xs);
+    border-radius:    var(--radius);
+    border:           1px solid var(--color-border);
+    background-color: var(--color-overlay);
+    color:            var(--color-subtle);
+    white-space:      nowrap;
+  }
+
+  /*
+    badge-detected
+    Evidence item found / present indicator.
+    Usage: <span className="badge badge-detected">Found</span>
+  */
+  .badge-detected {
+    background-color: var(--color-score-high-bg);
+    border-color:     var(--color-score-high);
+    color:            var(--color-score-high);
+  }
+
+  /*
+    badge-missing
+    Evidence item absent / not found indicator.
+    Usage: <span className="badge badge-missing">Missing</span>
+  */
+  .badge-missing {
+    background-color: var(--color-score-low-bg);
+    border-color:     var(--color-score-low);
+    color:            var(--color-score-low);
+  }
+
+  /* ── AI tag ──────────────────────────────────────────── */
+
+  /*
+    ai-tag
+    Small label marking AI-generated content.
+    Usage: <span className="ai-tag">AI</span>
+  */
+  .ai-tag {
+    display:          inline-flex;
+    align-items:      center;
+    padding-inline:   0.375rem;
+    padding-block:    0.125rem;
+    background-color: var(--color-accent-muted);
+    color:            var(--color-accent);
+    font-size:        var(--text-2xs);
+    font-weight:      var(--font-weight-semibold);
+    letter-spacing:   0.06em;
+    text-transform:   uppercase;
+    border-radius:    var(--radius);
+    border:           1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+
+  /* ── Score tier modifiers ────────────────────────────── */
+
+  /*
+    tier-high / tier-mid / tier-low
+    Applied to score display containers to color the number
+    and its background.
+    Usage: <div className="tier-high">
+  */
+  .tier-high {
+    color:            var(--color-score-high);
+    background-color: var(--color-score-high-bg);
+  }
+
+  .tier-mid {
+    color:            var(--color-score-mid);
+    background-color: var(--color-score-mid-bg);
+  }
+
+  .tier-low {
+    color:            var(--color-score-low);
+    background-color: var(--color-score-low-bg);
+  }
+
+  /* ── Chevron ─────────────────────────────────────────── */
+
+  /*
+    chevron
+    Animated expand/collapse indicator.
+    Usage: <svg className="chevron chevron-open">
+  */
+  .chevron {
+    width:      1rem;
+    height:     1rem;
+    flex-shrink: 0;
+    color:      var(--color-ghost);
+    transition: transform var(--duration-fast) var(--ease-out-expo),
+                color     var(--duration-fast) var(--ease-out-expo);
+  }
+
+  .chevron-open {
+    transform: rotate(180deg);
+    color:     var(--color-subtle);
+  }
+
+}
+
+
+/* ============================================================
+   4. UTILITIES — single-purpose helpers not auto-generated
+   ============================================================ */
+
+@layer utilities {
+
+  /* Score composite text — size + tracking + tabular nums */
+  .text-score-sm {
+    font-size:           var(--text-score-sm);
+    line-height:         var(--leading-score-sm);
+    letter-spacing:      var(--tracking-score-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .text-score-lg {
+    font-size:           var(--text-score-lg);
+    line-height:         var(--leading-score-lg);
+    letter-spacing:      var(--tracking-score-lg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tabular nums standalone */
+  .nums-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Explicit max-width aliases */
+  .max-w-content { max-width: 720px; }
+  .max-w-wide    { max-width: 960px; }
+
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d4d4d8;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
 }

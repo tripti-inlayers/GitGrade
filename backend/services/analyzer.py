@@ -1,12 +1,11 @@
 from services.evidence_extractor import *
 from services.scorer import *
-from models import (
-    RepositoryEvidence,
-    RepositoryScores,
-    RepositoryAnalysis
-)
+from services.ai_analyzer import generate_report
+from datetime import datetime
 
 def analyze_repository(snapshot):
+
+    repo = snapshot["repo"]
 
     documentation_evidence = extract_documentation(snapshot)
     documentation_score = score_documentation(
@@ -43,46 +42,51 @@ def analyze_repository(snapshot):
         readiness_score
     )
 
-    evidence = RepositoryEvidence(
-    documentation=documentation_evidence,
-    organization=organization_evidence,
-    development=development_evidence,
-    project_readiness=readiness_evidence
-)
+    print("OVERALL:", overall_score)
+    print("DOC:", documentation_score)
+    print("ORG:", organization_score)
+    print("DEV:", development_score)
+    print("READY:", readiness_score)
 
-    scores = RepositoryScores(
-        documentation=documentation_score,
-        organization=organization_score,
-        development=development_score,
-        project_readiness=readiness_score,
-        overall=overall_score
+    generated_at = datetime.now().strftime(
+        "%d %b %Y • %I:%M %p"
     )
 
-    analysis = RepositoryAnalysis(
-        evidence=evidence,
-        scores=scores
-    )
+    analysis = {
 
-    return {
-        "overall_score": overall_score,
+        "generated_at": generated_at,
 
-        "documentation": {
-            "score": documentation_score,
-            "evidence": documentation_evidence
+        "repository": {
+            "owner": repo["owner"],
+            "name": repo["name"],
+            "description": repo["description"],
+            "language": repo["language"],
+            "stars": repo["stars"],
+            "forks": repo["forks"],
+            "avatar_url": repo["avatar_url"],
+            "github_url": repo["html_url"],
+            "updated_at": repo["updated_at"]
         },
 
-        "organization": {
-            "score": organization_score,
-            "evidence": organization_evidence
+        "scores": {
+            "overall": overall_score,
+            "documentation": documentation_score,
+            "organization": organization_score,
+            "development": development_score,
+            "project_readiness": readiness_score
         },
 
-        "development": {
-            "score": development_score,
-            "evidence": development_evidence
+        "evidence": {
+            "documentation": documentation_evidence,
+            "organization": organization_evidence,
+            "development": development_evidence,
+            "project_readiness": readiness_evidence
         },
 
-        "project_readiness": {
-            "score": readiness_score,
-            "evidence": readiness_evidence
-        }
+        "assessment": None,
+
+        "generated_at": generated_at
     }
+
+    analysis["assessment"] = generate_report(analysis)
+    return analysis
