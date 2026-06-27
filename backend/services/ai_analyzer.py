@@ -91,7 +91,7 @@ def generate_report(analysis):
     )
 
     model = genai.GenerativeModel(
-        "gemini-1.5-flash"
+        "gemini-flash-lite-latest"
     )
 
     try:
