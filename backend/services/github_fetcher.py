@@ -1,11 +1,26 @@
 import requests
 import base64
+import os
 
+def github_get(url):
+    headers = {}
+
+    token = os.getenv("GITHUB_TOKEN")
+
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    return requests.get(
+        url,
+        headers=headers,
+        timeout=10
+    )
 
 def get_repo_details(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}"
 
-    response = requests.get(url, timeout=10)
+    response = github_get(url)
+
     if response.status_code != 200:
         return {"error": "Repository not found"}
 
@@ -28,7 +43,7 @@ def get_repo_details(owner, repo):
 def get_readme(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/readme"
 
-    response = requests.get(url, timeout=10)
+    response = github_get(url)
 
     if response.status_code != 200:
         return {
@@ -57,7 +72,7 @@ def get_readme(owner, repo):
 def get_commits(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/commits?per_page=50"
 
-    response = requests.get(url, timeout=10)
+    response = github_get(url)
 
     if response.status_code != 200:
         return {
@@ -85,7 +100,7 @@ def get_commits(owner, repo):
 def get_contributors(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors?per_page=20"
 
-    response = requests.get(url, timeout=10)
+    response = github_get(url)
 
     if response.status_code != 200:
         return {
@@ -115,7 +130,7 @@ def get_file_tree(owner, repo):
 
     url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{default_branch}?recursive=1"
 
-    response = requests.get(url, timeout=10)
+    response = github_get(url)
 
     if response.status_code != 200:
         return {

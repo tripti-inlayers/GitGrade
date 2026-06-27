@@ -5,16 +5,47 @@ from services.scorer import score_documentation, score_organization, score_devel
 from services.analyzer import analyze_repository
 from dotenv import load_dotenv
 from services.ai_analyzer import generate_report
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
+from fastapi.responses import JSONResponse
 
 load_dotenv()
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+@app.exception_handler(Exception)
+async def global_exception_handler(
+    request: Request,
+    exc: Exception
+):
+    print(exc)
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "message": "Internal Server Error"
+        },
+    )
 
 @app.get("/")
 def home():
-    return {"message": "GitGrade Backend Running"}
+    return {
+        "message": "GitGrade Backend Running",
+        "status": "ok",
+        "version": "1.0.0"
+    }
 
 
 @app.get("/repo/{owner}/{repo}")
@@ -134,3 +165,10 @@ def report(owner: str, repo: str):
     )
 
     return ai_report
+
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "version": "1.0.0"
+    }
