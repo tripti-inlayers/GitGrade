@@ -2,6 +2,7 @@ from services.evidence_extractor import *
 from services.scorer import *
 from services.ai_analyzer import generate_report
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 def analyze_repository(snapshot):
 
@@ -41,9 +42,9 @@ def analyze_repository(snapshot):
     print("ORG:", organization_score)
     print("READY:", readiness_score)
 
-    generated_at = datetime.now().strftime(
-        "%d %b %Y • %I:%M %p"
-    )
+    generated_at = datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    ).strftime("%d %b %Y • %I:%M %p")
 
     analysis = {
 
