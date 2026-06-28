@@ -131,24 +131,31 @@ def extract_organization(snapshot):
     ]
     for path in paths
 )
+    
+    BUILD_ARTIFACTS = [
+        "node_modules/",
+        "dist/",
+        "build/",
+        "__pycache__/",
+        ".next/",
+        ".parcel-cache/",
+        ".turbo/",
+    ]
 
-    tests_folder_present = any(
-        path.startswith("tests/")
-        or path.startswith("test/")
+    no_build_artifacts = not any(
+        any(
+            path.startswith(artifact)
+            for artifact in BUILD_ARTIFACTS
+        )
         for path in paths
     )
 
-    github_actions_present = any(
-        path.startswith(".github/")
-        for path in paths
-    )
 
     return {
         "gitignore_present": gitignore_present,
         "dependency_file_present": dependency_file_present,
         "logical_structure_present": logical_structure_present,
-        "tests_folder_present": tests_folder_present,
-        "github_actions_present": github_actions_present
+        "no_build_artifacts": no_build_artifacts,
     }
 
 def extract_development_practices(snapshot):
@@ -225,6 +232,41 @@ def extract_project_readiness(snapshot):
     if snapshot["file_tree"]["exists"]:
         paths = snapshot["file_tree"]["data"]
 
+    env_example_present = any(
+        path.lower() == ".env.example"
+        for path in paths
+    )
+
+    environment_documented = env_example_present
+
+    if snapshot["readme"]["exists"]:
+        content = snapshot["readme"]["data"]["content"].lower()
+
+        environment_documented = (
+            environment_documented
+            or ".env" in content
+            or "environment" in content
+            or "configuration" in content
+        )
+
+    project_documentation_present = any(
+            path.lower() in [
+                "contributing.md",
+                "architecture.md",
+                "api.md",
+                "design.md"
+            ]
+            for path in paths
+        )
+
+    project_documentation_present = (
+            project_documentation_present
+            or any(
+                path.startswith("docs/")
+                for path in paths
+            )
+        )
+
     repo = snapshot["repo"]
 
     has_license = any(
@@ -239,15 +281,35 @@ def extract_project_readiness(snapshot):
     DEPLOYMENT_FILES = [
         "dockerfile",
         "docker-compose.yml",
-        "procfile"
+        "procfile",
+        "vercel.json"
     ]
 
     has_deployment_evidence = any(
         path.lower() in DEPLOYMENT_FILES
         or path.startswith(".github/workflows/")
-        or path.endswith("vercel.json")
         for path in paths
     )
+
+    if snapshot["readme"]["exists"]:
+        content = snapshot["readme"]["data"]["content"].lower()
+
+        deployment_keywords = [
+            "vercel.app",
+            "netlify.app",
+            "onrender.com",
+            "railway.app",
+            "render.com",
+            "live demo"
+        ]
+
+        has_deployment_evidence = (
+            has_deployment_evidence
+            or any(
+                keyword in content
+                for keyword in deployment_keywords
+            )
+        )
 
     created_date = datetime.fromisoformat(
         repo["created_at"].replace("Z", "+00:00")
@@ -277,8 +339,11 @@ def extract_project_readiness(snapshot):
 
     return {
         "has_license": has_license,
-        "has_deployment_evidence":
-            has_deployment_evidence,
+        "has_deployment_evidence": has_deployment_evidence,
+
+        "environment_documented": environment_documented,
+        "project_documentation_present": project_documentation_present,
+
         "repo_age_days": repo_age_days,
-        "recent_activity_days": recent_activity_days
+        "recent_activity_days": recent_activity_days,
     }

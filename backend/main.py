@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from services.github_fetcher import get_repo_details,get_readme,get_commits,get_contributors,get_file_tree,fetch_snapshot
 from services.evidence_extractor import extract_documentation, extract_organization, extract_development_practices, extract_project_readiness
-from services.scorer import score_documentation, score_organization, score_development_practices, score_project_readiness, calculate_overall_score
+from services.scorer import score_documentation, score_organization, score_project_readiness, calculate_overall_score
 from services.analyzer import analyze_repository
 from dotenv import load_dotenv
 from services.ai_analyzer import generate_report
@@ -114,10 +114,7 @@ def dev_practices_score(owner: str, repo: str):
 
     evidence = extract_development_practices(snapshot)
 
-    score = score_development_practices(evidence)
-
     return {
-        "score": score,
         "evidence": evidence
     }
 

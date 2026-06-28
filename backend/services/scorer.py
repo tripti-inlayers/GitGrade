@@ -24,6 +24,7 @@ def score_documentation(evidence):
 
     return score
 
+
 def score_organization(evidence):
     score = 0
 
@@ -36,69 +37,34 @@ def score_organization(evidence):
     if evidence["logical_structure_present"]:
         score += 20
 
-    if evidence["tests_folder_present"]:
-        score += 20
-
-    if evidence["github_actions_present"]:
-        score += 20
+    if evidence["no_build_artifacts"]:
+        score += 40
 
     return score
 
-def score_development_practices(evidence):
-    score = 0
-
-    if evidence["commit_count"] >= 20:
-        score += 30
-    elif evidence["commit_count"] >= 10:
-        score += 20
-    elif evidence["commit_count"] >= 5:
-        score += 10
-
-    score += int(
-        evidence["quality_commit_ratio"] * 40
-    )
-
-    spread = evidence["commit_activity_spread_days"]
-
-    if spread >= 30:
-        score += 30
-    elif spread >= 14:
-        score += 20
-    elif spread >= 7:
-        score += 10
-
-    return min(score, 100)
 
 def score_project_readiness(evidence):
     score = 0
 
-    if evidence["has_license"]:
-        score += 25
-
     if evidence["has_deployment_evidence"]:
-        score += 25
+        score += 45
 
-    if evidence["repo_age_days"] >= 30:
-        score += 25
-    elif evidence["repo_age_days"] >= 7:
-        score += 15
+    if evidence["environment_documented"]:
+        score += 30
 
-    if evidence["recent_activity_days"] <= 30:
+    if evidence["project_documentation_present"]:
         score += 25
-    elif evidence["recent_activity_days"] <= 90:
-        score += 15
 
     return score
+
 
 def calculate_overall_score(
     documentation,
     organization,
-    development,
-    readiness
+    project_readiness,
 ):
     return round(
         documentation * 0.30 +
-        organization * 0.20 +
-        development * 0.30 +
-        readiness * 0.20
+        organization * 0.35 +
+        project_readiness * 0.35
     )

@@ -6,6 +6,7 @@ import Highlights from "@/components/results/Highlights";
 import ImprovementAreas from "@/components/results/ImprovementAreas";
 import Recommendations from "@/components/results/Recommendations";
 import Navbar from "@/components/common/Navbar";
+import RepositoryMetadata from "@/components/results/RepositoryMetadata";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -64,26 +65,26 @@ export default async function ResultsPage({
 
             <DimensionCard
                 title="Documentation"
+                weight="30%"
                 score={report.scores.documentation}
                 evidence={report.evidence.documentation}
             />
 
             <DimensionCard
-                title="Project Organization"
+                title="Project Structure"
+                weight="35%"
                 score={report.scores.organization}
                 evidence={report.evidence.organization}
             />
 
             <DimensionCard
-                title="Development Practices"
-                score={report.scores.development}
-                evidence={report.evidence.development}
-            />
-
-            <DimensionCard
-                title="Project Readiness"
+                title="Project Completeness"
+                weight="35%"
                 score={report.scores.project_readiness}
                 evidence={report.evidence.project_readiness}
+            />
+            <RepositoryMetadata
+                metadata={report.metadata}
             />
 
             </div>

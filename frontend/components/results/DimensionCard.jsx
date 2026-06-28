@@ -17,15 +17,40 @@ function getBorder(score) {
 
 export default function DimensionCard({
   title,
+  weight,
   score,
   evidence,
 }) {
 
-  const [expanded, setExpanded] =
-    useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  const items = Object.entries(
-    evidence || {}
+  const LABELS = {
+    readme_exists: "README Present",
+    meaningful_readme: "Detailed README",
+    installation_present: "Installation Guide",
+    usage_present: "Usage Examples",
+    tech_stack_present: "Technologies Used",
+    screenshots_present: "Visual Preview",
+    demo_link_present: "Live Demo",
+
+    gitignore_present: "Git Ignore Configured",
+    dependency_file_present: "Dependencies Declared",
+    logical_structure_present: "Organised Folder Structure",
+    no_build_artifacts: "Clean Repository",
+
+    has_license: "License Included",
+    has_deployment_evidence: "Deployment Configured",
+    environment_documented: "Environment Setup Documented",
+    project_documentation_present: "Additional Project Docs",
+  };
+
+  const items = Object.entries(evidence || {}).filter(
+    ([key]) =>
+      ![
+        "readme_size",
+        "repo_age_days",
+        "recent_activity_days",
+      ].includes(key)
   );
 
   return (
@@ -41,9 +66,17 @@ export default function DimensionCard({
             className="flex w-full items-center justify-between"
             >
 
-            <p className="label">
-                {title}
-            </p>
+            <div className="text-left">
+
+                <p className="label">
+                    {title}
+                </p>
+
+                <p className="mt-1 text-xs text-subtle">
+                    {weight} of Overall Score
+                </p>
+
+            </div>
 
             <div className="flex items-center gap-3">
 
@@ -91,8 +124,7 @@ export default function DimensionCard({
 
                 <EvidenceItem
                   key={key}
-                  label={key
-                    .replaceAll("_", " ")}
+                  label={LABELS[key] || key.replaceAll("_", " ")}
                   detected={
                     Boolean(value)
                   }

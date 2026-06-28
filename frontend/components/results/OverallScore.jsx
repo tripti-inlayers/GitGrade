@@ -44,9 +44,7 @@ export default function OverallScore({ score }) {
           </h2>
 
           <p className="mt-3 max-w-lg text-subtle">
-            Overall quality based on documentation,
-            organization, development practices and
-            project readiness.
+            Overall quality based on documentation, project structure and project completeness. Repository metadata is shown separately for additional context and does not influence the score.
           </p>
 
         </div>

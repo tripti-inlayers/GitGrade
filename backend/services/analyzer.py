@@ -20,11 +20,6 @@ def analyze_repository(snapshot):
     development_evidence = (
         extract_development_practices(snapshot)
     )
-    development_score = (
-        score_development_practices(
-            development_evidence
-        )
-    )
 
     readiness_evidence = (
         extract_project_readiness(snapshot)
@@ -38,14 +33,12 @@ def analyze_repository(snapshot):
     overall_score = calculate_overall_score(
         documentation_score,
         organization_score,
-        development_score,
         readiness_score
     )
 
     print("OVERALL:", overall_score)
     print("DOC:", documentation_score)
     print("ORG:", organization_score)
-    print("DEV:", development_score)
     print("READY:", readiness_score)
 
     generated_at = datetime.now().strftime(
@@ -72,7 +65,6 @@ def analyze_repository(snapshot):
             "overall": overall_score,
             "documentation": documentation_score,
             "organization": organization_score,
-            "development": development_score,
             "project_readiness": readiness_score
         },
 
@@ -83,6 +75,16 @@ def analyze_repository(snapshot):
             "project_readiness": readiness_evidence
         },
 
+        "metadata": {
+            "primary_language": repo["language"],
+            "repository_age_days": readiness_evidence["repo_age_days"],
+            "last_updated_days": readiness_evidence["recent_activity_days"],
+            "commit_count": development_evidence["commit_count"],
+            "meaningful_commit_ratio": development_evidence["quality_commit_ratio"],
+            "contributors": len(
+                snapshot["contributors"]["data"]
+            ) if snapshot["contributors"]["exists"] else 0,
+        },
         "assessment": None,
 
         "generated_at": generated_at
