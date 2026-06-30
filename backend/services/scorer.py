@@ -46,14 +46,17 @@ def score_organization(evidence):
 def score_project_readiness(evidence):
     score = 0
 
+    if evidence["has_license"]:
+        score += 20
+
     if evidence["has_deployment_evidence"]:
-        score += 45
+        score += 35
 
     if evidence["environment_documented"]:
-        score += 30
+        score += 25
 
     if evidence["project_documentation_present"]:
-        score += 25
+        score += 20
 
     return score
 

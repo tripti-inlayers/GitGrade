@@ -28,10 +28,21 @@ def extract_documentation(snapshot):
             "pip install",
             "pnpm install",
             "yarn",
-            "docker",
-            "cargo",
             "brew install",
-            "apt install"
+            "apt install",
+            "cargo",
+
+            # Sections / Headings
+            "installation",
+            "install",
+            "getting started",
+            "setup",
+            "set up",
+            "software to install",
+            "softwares to install",
+            "requirements",
+            "prerequisites",
+            "environment setup"
         ]
 
         installation_present = any(
@@ -40,10 +51,16 @@ def extract_documentation(snapshot):
         )
 
         usage_keywords = [
-            "## usage",
-            "## getting started",
-            "## example",
-            "## examples"
+            "usage",
+            "how to use",
+            "quick start",
+            "run",
+            "running",
+            "execute",
+            "examples",
+            "example",
+            "how to run",
+            "how to use this repository"
         ]
 
         usage_present = any(
